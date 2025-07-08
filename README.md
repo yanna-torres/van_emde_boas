@@ -19,3 +19,7 @@
     ```bash
     python app.py commands.txt
     ```
+
+## Referências
+
+> Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest, and Clifford Stein. "van Emde Boas Trees." In: **Introduction to Algorithms, Third Edition (3rd. ed.)**, pp. 531-560. The MIT Press, 2009.
