@@ -23,9 +23,9 @@ class ProtovEB:
         if self.u == 2:
             return self.a
         result = []
-        for i, cluster in enumerate(self.a):
+        for cluster in enumerate(self.a):
             cluster_values = cluster.__reconstruct_vector__()
-            for j, val in enumerate(cluster_values):
+            for val in enumerate(cluster_values):
                 result.append(val)
         return result
 
