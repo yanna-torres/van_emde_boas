@@ -4,10 +4,12 @@ import math
 class VanEmdeBoas:
     def __init__(self, u):
         self.u = u  # universe size
-        # if u is a even power of 2, k_upper and k_lower are equal
-        self.k_upper = math.ceil(math.sqrt(u))  # upper bound of k
-        self.k_lower = math.floor(math.sqrt(u))  # lower bound of k
         self.is_base = u == 2
+
+        # if u is 2^y, k_upper and k_lower are equal
+        log_u = int(math.log2(u))
+        self.upper_sqrt = 2 ** math.ceil(log_u / 2)
+        self.lower_sqrt = 2 ** math.floor(log_u / 2)
 
         self.min = None  # minimum element, does not appear in the clusters
         self.max = None  # maximum element, appears in the clusters
@@ -15,20 +17,40 @@ class VanEmdeBoas:
         self.summary = None
         self.clusters = None
         if not self.is_base:
-            self.summary = VanEmdeBoas(self.k_upper)  # exists only if u > 2
-            self.clusters = [VanEmdeBoas(self.k_lower) for _ in range(self.k_upper)]
+            self.summary = VanEmdeBoas(self.upper_sqrt)  # exists only if u > 2
+            self.clusters = [
+                VanEmdeBoas(self.lower_sqrt) for _ in range(self.upper_sqrt)
+            ]
 
     def __str__(self):
-        return f"VanEmdeBoas(u={self.u}, min={self.min}, max={self.max}, summary={self.summary}, data={self.clusters})"
+        return f"VanEmdeBoas(u={self.u}, min={self.min}, max={self.max}, summary={self.summary.__reconstruct_vector__()}, data={self.__reconstruct_vector__()})"
+
+    def __reconstruct_vector__(self):
+        if self.min is None:
+            return []
+
+        result = [self.min] if self.min == self.max else [self.min]
+
+        if not self.is_base:
+            for i in range(self.upper_sqrt):
+                cluster = self.clusters[i]
+                cluster_vals = cluster.__reconstruct_vector__()
+                for val in cluster_vals:
+                    result.append(self.index(i, val))
+
+        if self.max != self.min:
+            result.append(self.max)
+
+        return sorted(set(result))
 
     def high(self, x):
-        return math.floor(x / self.k_lower)
+        return math.floor(x / self.lower_sqrt)
 
     def low(self, x):
-        return x % self.k_lower
+        return x % self.lower_sqrt
 
     def index(self, x, y):
-        return x * self.k_lower + y
+        return x * self.lower_sqrt + y
 
     def minimum(self):
         return self.min
@@ -93,16 +115,17 @@ class VanEmdeBoas:
     def insert(self, x):
         if self.min is None:
             self.empty_tree_insert(x)
+            return
         if x < self.min:
             x, self.min = self.min, x  # exchange x with self.min
-            if self.u > 2:
-                high = self.high(x)
-                low = self.low(x)
-                if self.clusters[high].minimum() is None:
-                    self.summary.insert(high)
-                    self.clusters[high].empty_tree_insert(low)
-                else:
-                    self.clusters[high].insert(low)
+        if self.u > 2:
+            high = self.high(x)
+            low = self.low(x)
+            if self.clusters[high].minimum() is None:
+                self.summary.insert(high)
+                self.clusters[high].empty_tree_insert(low)
+            else:
+                self.clusters[high].insert(low)
         if x > self.max:
             self.max = x
 
