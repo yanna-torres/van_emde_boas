@@ -165,7 +165,7 @@ class VanEmdeBoas:
 
 if __name__ == "__main__":
     # Example usage
-    tree = VanEmdeBoas(16)
+    tree = VanEmdeBoas(32)
     tree.insert(2)
     tree.insert(3)
     tree.insert(4)
