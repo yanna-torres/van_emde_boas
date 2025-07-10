@@ -23,7 +23,7 @@ class VanEmdeBoas:
             ]
 
     def __str__(self):
-        return f"VanEmdeBoas(u={self.u}, min={self.min}, max={self.max}, summary={self.summary.__reconstruct_vector__()}, data={self.__reconstruct_vector__()})"
+        return f"VanEmdeBoas(u={self.u}, min={self.min}, max={self.max}, summary=(u={self.summary.u}, data={self.summary.__reconstruct_vector__()}), data={self.__reconstruct_vector__()})"
 
     def __reconstruct_vector__(self):
         if self.min is None:
@@ -67,7 +67,7 @@ class VanEmdeBoas:
         low = self.low(x)
         return self.clusters[high].member(low)
 
-    def sucessor(self, x):
+    def successor(self, x):
         if self.is_base:
             if x == 0 and self.max == 1:
                 return 1
@@ -78,9 +78,9 @@ class VanEmdeBoas:
         low = self.low(x)
         max_low = self.clusters[high].maximum()
         if max_low is not None and low < max_low:
-            offset = self.clusters[high].sucessor(low)
+            offset = self.clusters[high].successor(low)
             return self.index(high, offset)
-        succ_cluster = self.summary.sucessor(high)
+        succ_cluster = self.summary.successor(high)
         if succ_cluster is None:
             return None
         offset = self.clusters[succ_cluster].minimum()
@@ -129,6 +129,39 @@ class VanEmdeBoas:
         if x > self.max:
             self.max = x
 
+    def delete(self, x):
+        if self.min == self.max:
+            self.min = None
+            self.max = None
+            return
+        if self.is_base:
+            if x == 0:
+                self.min = 1
+            else:
+                self.min = 0
+            self.max = self.min
+            return
+        if x == self.min:
+            first_cluster = self.summary.minimum()
+            x = self.index(first_cluster, self.clusters[first_cluster].minimum())
+            self.min = x
+        high = self.high(x)
+        low = self.low(x)
+        self.clusters[high].delete(low)
+        if self.clusters[high].minimum() is None:
+            self.summary.delete(high)
+            if x == self.max:
+                summary_max = self.summary.maximum()
+                if summary_max is None:
+                    self.max = self.min
+                else:
+                    self.max = self.index(
+                        summary_max, self.clusters[summary_max].maximum()
+                    )
+        else:
+            if x == self.max:
+                self.max = self.index(high, self.clusters[high].maximum())
+
 
 if __name__ == "__main__":
     # Example usage
@@ -141,3 +174,15 @@ if __name__ == "__main__":
     tree.insert(14)
     tree.insert(15)
     print(tree)
+
+    tree.delete(2)
+    print(tree)
+    print("Member 3:", tree.member(3))
+    tree.delete(3)
+    print("Minimum:", tree.minimum())
+    print("Maximum:", tree.maximum())
+    print("Predecessor of 5:", tree.predecessor(5))
+    print("Predecessor of 14:", tree.predecessor(14))
+    print("Predecessor of 7:", tree.predecessor(7))
+    print("Successor of 5:", tree.successor(5))
+    print("Successor of 14:", tree.successor(14))
