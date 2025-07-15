@@ -55,7 +55,7 @@ class HashTable:
 
         for entry in old_table:
             if entry and not entry.deleted:
-                self.insert(entry.key, entry.value)
+                self._direct_insert(entry.key, entry.value)
 
     def _check_resize(self):
         load = self.size / self.capacity

@@ -15,28 +15,47 @@ class RSVanEmdeBoas:
         self.clusters = HashTable()
 
     def __str__(self):
-      output = []
-      if self.min is None:
-          output.append("Min: None")
-          return " ".join(output)
+        output = []
+        if self.min is None:
+            output.append("Min: None")
+            return " ".join(output)
 
-      output.append(f"Min: {self.min}")
+        output.append(f"Min: {self.min}")
 
-      # Reconstrói os dados armazenados agrupados por cluster
-      cluster_outputs = []
-      for i in range(self.clusters.capacity):
-          entry = self.clusters.table[i]
-          if entry and not entry.deleted:
-              cluster_index = entry.key
-              cluster = entry.value
-              values = cluster.__reconstruct_values__()
-              if values:
-                  full_values = [cluster.index(cluster_index, v) for v in values]
-                  full_values_str = ", ".join(str(v) for v in sorted(set(full_values)))
-                  cluster_outputs.append(f"C[{cluster_index}]: {full_values_str}")
+        # Reconstrói os dados armazenados agrupados por cluster
+        cluster_outputs = []
+        for i in range(self.clusters.capacity):
+            entry = self.clusters.table[i]
+            if entry and not entry.deleted:
+                cluster_index = entry.key
+                cluster = entry.value
+                values = cluster.__reconstruct_values__()
+                if values:
+                    full_values = [cluster.index(cluster_index, v) for v in values]
+                    full_values_str = ", ".join(
+                        str(v) for v in sorted(set(full_values))
+                    )
+                    cluster_outputs.append(f"C[{cluster_index}]: {full_values_str}")
 
-      output.extend(cluster_outputs)
-      return " ".join(output)
+        output.extend(cluster_outputs)
+        return " ".join(output)
+
+    def __reconstruct_values__(self):
+        values = []
+        if self.min is not None:
+            values.append(self.min)
+            if self.max != self.min:
+                values.append(self.max)
+
+        if not self.is_base:
+            for i in range(self.clusters.capacity):
+                entry = self.clusters.table[i]
+                if entry and not entry.deleted:
+                    cluster = entry.value
+                    cluster_vals = cluster.__reconstruct_values__()
+                    values.extend(cluster_vals)
+
+        return values
 
     def high(self, x):
         return x // self.lower_sqrt
