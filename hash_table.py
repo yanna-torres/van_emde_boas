@@ -12,14 +12,14 @@ LARGE_PRIME = 2**31 - 1
 
 
 class HashTable:
-    def __init__(self, initial_capacity=4):
+    def __init__(self, initial_capacity=4, a=None, b=None):
         self.capacity = initial_capacity
         self.size = 0
         self.table = [None] * self.capacity
 
-        self.p = 2_147_483_647  # Large prime
-        self.a = random.randint(1, self.p - 1)
-        self.b = random.randint(0, self.p - 1)
+        self.p = LARGE_PRIME
+        self.a = a if a is not None else random.randint(1, self.p - 1)
+        self.b = b if b is not None else random.randint(0, self.p - 1)
 
     def _hash(self, key, i):
         base_hash = ((self.a * key + self.b) % self.p) % self.capacity
@@ -32,7 +32,7 @@ class HashTable:
             if entry is None or entry.key == key:
                 return idx
         raise RuntimeError("Hash table is full")
-    
+
     def _direct_insert(self, key, value):
         for i in range(self.capacity):
             idx = self._hash(key, i)
@@ -46,12 +46,16 @@ class HashTable:
                 return
         raise RuntimeError("Hash table is full during direct insert")
 
-
     def _resize(self, new_capacity):
         old_table = self.table
+        old_a = self.a
+        old_b = self.b
+
         self.capacity = new_capacity
         self.table = [None] * self.capacity
         self.size = 0
+        self.a = old_a
+        self.b = old_b
 
         for entry in old_table:
             if entry and not entry.deleted:

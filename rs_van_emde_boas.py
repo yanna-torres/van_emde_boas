@@ -38,7 +38,7 @@ class RSVanEmdeBoas:
                     cluster_outputs.append(f"C[{cluster_index}]: {full_values_str}")
 
         output.extend(cluster_outputs)
-        return " ".join(output)
+        return ", ".join(output)
 
     def __reconstruct_values__(self):
         values = []
