@@ -3,6 +3,15 @@ from hash_table import HashTable
 
 
 class RSVanEmdeBoas:
+    """
+    RSVanEmdeBoas is a van Emde Boas tree implementation using a hash table for clusters.
+    It supports operations like insert, delete, member, minimum, maximum, successor, and predecessor.
+    It is designed for integers in the range [0, u-1].
+    The tree is structured with a summary for clusters and uses a hash table to manage clusters.
+    The base case is when u = 2, where it behaves like a simple bit vector.
+    The tree supports efficient operations with O(log log u) time complexity for most operations.
+    """
+
     def __init__(self, u):
         self.u = u
         self.is_base = u == 2
