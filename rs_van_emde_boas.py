@@ -44,10 +44,11 @@ class RSVanEmdeBoas:
         if self.min is None:
             return []
 
-        values = set()
-        values.add(self.min)
-        if self.max is not None:
-            values.add(self.max)
+        values = []
+        values.append(self.min)
+
+        if self.max is not None and self.max != self.min:
+            values.append(self.max)
 
         if not self.is_base:
             for i in range(self.clusters.capacity):
@@ -57,9 +58,11 @@ class RSVanEmdeBoas:
                     cluster = entry.value
                     cluster_values = cluster.__reconstruct_values__()
                     for val in cluster_values:
-                        values.add(self.index(cluster_index, val))
+                        full_val = self.index(cluster_index, val)
+                        if full_val not in values:
+                            values.append(full_val)
 
-        return sorted(values)
+        return values
 
     def high(self, x):
         return x // self.lower_sqrt
