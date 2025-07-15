@@ -22,7 +22,6 @@ class RSVanEmdeBoas:
 
         output.append(f"Min: {self.min}")
 
-        # Reconstrói os dados armazenados agrupados por cluster
         cluster_outputs = []
         for i in range(self.clusters.capacity):
             entry = self.clusters.table[i]
@@ -31,7 +30,8 @@ class RSVanEmdeBoas:
                 cluster = entry.value
                 values = cluster.__reconstruct_values__()
                 if values:
-                    full_values = [cluster.index(cluster_index, v) for v in values]
+                    # CORREÇÃO AQUI:
+                    full_values = [self.index(cluster_index, v) for v in values]
                     full_values_str = ", ".join(
                         str(v) for v in sorted(set(full_values))
                     )
@@ -41,21 +41,25 @@ class RSVanEmdeBoas:
         return ", ".join(output)
 
     def __reconstruct_values__(self):
-        values = []
-        if self.min is not None:
-            values.append(self.min)
-            if self.max != self.min:
-                values.append(self.max)
+        if self.min is None:
+            return []
+
+        values = set()
+        values.add(self.min)
+        if self.max is not None:
+            values.add(self.max)
 
         if not self.is_base:
             for i in range(self.clusters.capacity):
                 entry = self.clusters.table[i]
                 if entry and not entry.deleted:
+                    cluster_index = entry.key
                     cluster = entry.value
-                    cluster_vals = cluster.__reconstruct_values__()
-                    values.extend(cluster_vals)
+                    cluster_values = cluster.__reconstruct_values__()
+                    for val in cluster_values:
+                        values.add(self.index(cluster_index, val))
 
-        return values
+        return sorted(values)
 
     def high(self, x):
         return x // self.lower_sqrt
@@ -203,27 +207,3 @@ class RSVanEmdeBoas:
                         )
             elif x == self.max:
                 self.max = self.index(high, cluster.maximum())
-
-
-if __name__ == "__main__":
-    tree = RSVanEmdeBoas(16)
-    tree.insert(2)
-    tree.insert(3)
-    tree.insert(4)
-    tree.insert(5)
-    tree.insert(7)
-    tree.insert(14)
-    tree.insert(15)
-    print(tree)
-
-    tree.delete(2)
-    print(tree)
-    print("Member 3:", tree.member(3))
-    tree.delete(3)
-    print("Minimum:", tree.minimum())
-    print("Maximum:", tree.maximum())
-    print("Predecessor of 5:", tree.predecessor(5))
-    print("Predecessor of 14:", tree.predecessor(14))
-    print("Predecessor of 7:", tree.predecessor(7))
-    print("Successor of 5:", tree.successor(5))
-    print("Successor of 14:", tree.successor(14))
