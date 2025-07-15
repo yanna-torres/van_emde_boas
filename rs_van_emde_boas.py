@@ -4,12 +4,12 @@ from hash_table import HashTable
 
 class RSVanEmdeBoas:
     """
-    RSVanEmdeBoas is a van Emde Boas tree implementation using a hash table for clusters.
-    It supports operations like insert, delete, member, minimum, maximum, successor, and predecessor.
-    It is designed for integers in the range [0, u-1].
-    The tree is structured with a summary for clusters and uses a hash table to manage clusters.
-    The base case is when u = 2, where it behaves like a simple bit vector.
-    The tree supports efficient operations with O(log log u) time complexity for most operations.
+    RSVanEmdeBoas is a van Emde Boas tree implementation using a hash table for clusters.\n
+    It supports operations like insert, delete, member, minimum, maximum, successor, and predecessor.\n
+    It is designed for integers in the range `[0, u-1]`.\n
+    The tree is structured with a summary for clusters and uses a hash table to manage clusters.\n
+    The base case is when `u = 2`, where it behaves like a simple bit vector.
+    The tree supports efficient operations with `O(log log u)` time complexity for most operations.
     """
 
     def __init__(self, u):
@@ -49,6 +49,11 @@ class RSVanEmdeBoas:
         return ", ".join(output)
 
     def __reconstruct_values__(self):
+        """
+        Reconstructs the values stored in the van Emde Boas tree.\n
+        Returns a list of integers representing the values in the tree.\n
+        This method is used for visualization purposes.
+        """
         if self.min is None:
             return []
 
@@ -73,21 +78,48 @@ class RSVanEmdeBoas:
         return values
 
     def high(self, x):
+        """
+        Returns the high part of the integer `x` in the van Emde Boas tree.\n
+        The high part is the integer division of `x` by the lower square root of `u`.
+        """
         return x // self.lower_sqrt
 
     def low(self, x):
+        """
+        Returns the low part of the integer `x` in the van Emde Boas tree.\n
+        The low part is the remainder of `x` when divided by the lower square root of `u`.
+        """
         return x % self.lower_sqrt
 
     def index(self, x, y):
+        """
+        Combines the high part `x` and low part `y` into a single integer.\n
+        The result is calculated as `x * lower_sqrt + y`, where `lower_sqrt` is the lower square root of `u`.
+        """
         return x * self.lower_sqrt + y
 
     def minimum(self):
+        """
+        Returns the minimum value in the van Emde Boas tree.\n
+        If the tree is empty, it returns `None`.
+        """
         return self.min
 
     def maximum(self):
+        """
+        Returns the maximum value in the van Emde Boas tree.\n
+        If the tree is empty, it returns `None`.
+        """
         return self.max
 
     def member(self, x):
+        """
+        Checks if the integer `x` is a member of the van Emde Boas tree.\n
+        Returns `True` if `x` is in the tree, otherwise returns `False`.
+        If `x` is equal to the minimum or maximum, it returns `True` directly.\n
+        If the tree is a base case, it returns `False`, given that it only contains 0 and 1.\n
+        For non-base cases, it checks the cluster corresponding to the high part of `x`.
+        """
         if x == self.min or x == self.max:
             return True
         if self.is_base:
@@ -96,6 +128,12 @@ class RSVanEmdeBoas:
         return cluster.member(self.low(x)) if cluster else False
 
     def successor(self, x):
+        """
+        Returns the successor of the integer `x` in the van Emde Boas tree.\n
+        If `x` is less than the minimum, it returns the minimum.\n
+        If `x` is greater than the maximum, it returns `None`.\n
+        For non-base cases, it checks the cluster corresponding to the high part of `x`.
+        """
         if self.is_base:
             if x == 0 and self.max == 1:
                 return 1
@@ -119,6 +157,12 @@ class RSVanEmdeBoas:
         return self.index(succ_cluster, offset)
 
     def predecessor(self, x):
+        """
+        Returns the predecessor of the integer `x` in the van Emde Boas tree.\n
+        If `x` is greater than the maximum, it returns the maximum.\n
+        If `x` is less than the minimum, it returns `None`.\n
+        For non-base cases, it checks the cluster corresponding to the high part of `x`.
+        """
         if self.is_base:
             if x == 1 and self.min == 0:
                 return 0
@@ -147,6 +191,14 @@ class RSVanEmdeBoas:
         return self.index(pred_cluster, offset)
 
     def insert(self, x):
+        """
+        Inserts the integer `x` into the van Emde Boas tree.\n
+        If the tree is empty, it sets both minimum and maximum to `x`.\n
+        If `x` is less than the current minimum, it swaps them.\n
+        For non-base cases, it calculates the high and low parts of `x` and inserts.
+        If the cluster for the high part does not exist, it creates a new cluster.\n
+        If the cluster is empty, it updates the summary to include the high part.
+        """
         if self.min is None:
             self.min = x
             self.max = x
@@ -177,6 +229,13 @@ class RSVanEmdeBoas:
             self.max = x
 
     def delete(self, x):
+        """
+        Deletes the integer `x` from the van Emde Boas tree.\n
+        If the tree becomes empty, it sets both minimum and maximum to `None`.\n
+        If `x` is the minimum, it updates the minimum to the next successor.\n
+        For non-base cases, it finds the appropriate cluster and deletes the element.
+        If the cluster becomes empty, it removes it from the clusters and updates the summary.
+        """
         if self.min == self.max:
             self.min = None
             self.max = None

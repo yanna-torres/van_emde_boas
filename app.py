@@ -2,7 +2,9 @@ import sys
 from rs_van_emde_boas import RSVanEmdeBoas
 
 
-def process_commands_from_file(input_filename, output_filename, tree):
+def process_commands_from_file(
+    input_filename: str, output_filename: str, tree: RSVanEmdeBoas
+):
     output_lines = []
 
     with open(input_filename, "r") as file:
