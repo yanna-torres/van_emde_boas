@@ -30,7 +30,6 @@ class RSVanEmdeBoas:
                 cluster = entry.value
                 values = cluster.__reconstruct_values__()
                 if values:
-                    # CORREÇÃO AQUI:
                     full_values = [self.index(cluster_index, v) for v in values]
                     full_values_str = ", ".join(
                         str(v) for v in sorted(set(full_values))
