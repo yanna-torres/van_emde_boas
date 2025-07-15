@@ -1,5 +1,5 @@
 import sys
-from van_emde_boas import VanEmdeBoas
+from rs_van_emde_boas import RSVanEmdeBoas
 
 
 def process_commands_from_file(input_filename, output_filename, tree):
@@ -48,5 +48,5 @@ if __name__ == "__main__":
     input_file = sys.argv[1]
     output_file = sys.argv[2]
 
-    tree = VanEmdeBoas(32)
+    tree = RSVanEmdeBoas(32)
     process_commands_from_file(input_file, output_file, tree)
