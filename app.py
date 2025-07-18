@@ -50,5 +50,11 @@ if __name__ == "__main__":
     input_file = sys.argv[1]
     output_file = sys.argv[2]
 
+    if not input_file.lower().endswith(".txt") or not output_file.lower().endswith(
+        ".txt"
+    ):
+        print("Error: Both input and output files must have a .txt extension.")
+        sys.exit(1)
+
     tree = RSVanEmdeBoas(32)
     process_commands_from_file(input_file, output_file, tree)

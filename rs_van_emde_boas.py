@@ -4,7 +4,7 @@ from hash_table import HashTable
 
 class RSVanEmdeBoas:
     """
-    RSVanEmdeBoas is a van Emde Boas tree implementation using a hash table for clusters.\n
+    RSVanEmdeBoas is a van Emde Boas tree implementation using a hash table for clusters to reduce the space used.\n
     It supports operations like insert, delete, member, minimum, maximum, successor, and predecessor.\n
     It is designed for integers in the range `[0, u-1]`.\n
     The tree is structured with a summary for clusters and uses a hash table to manage clusters.\n
